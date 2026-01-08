@@ -4,8 +4,7 @@ const Note = require('../models/Notes');
 const createNote = async (req, res)=>{
     try{
         const note = await Note.create(req.body);
-        const savedNote = await note.save();
-        res.status(200).json(savedNote);
+        res.status(200).json(note);
     }catch(err){
         res.status(400).json({message: err.message});
     }
@@ -21,8 +20,21 @@ const getAllNotes = async(req,res) =>{
     }
 }
 
+// Get single note by ID
+const getSingleNote = async (req, res) => {
+    try {
+        const note = await Note.findById(req.params.id);
+        if (!note) {
+            return res.status(404).json({ message: 'Note not found' });
+        }
+        res.status(200).json(note);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
 //Searching & filtering
-const getNote = async (req, res) => {
+const getFilteredNotes = async (req, res) => {
     try {
         const { search, priority, pinned } = req.query;
         let query = {};
@@ -49,7 +61,7 @@ const getNote = async (req, res) => {
 };
 
 //Update Note
-const upDateNote = async(req,res) =>{
+const updateNote = async(req,res) =>{
     try{
         const updated = await Note.findByIdAndUpdate(
             req.params.id,
@@ -71,3 +83,5 @@ const deleteNote = async(req,res) =>{
         res.status(400).json({message:err.message});
     }
 }
+
+module.exports = { createNote, getAllNotes, getSingleNote, getFilteredNotes, updateNote, deleteNote };
